@@ -1,0 +1,9 @@
+version: "3"
+services:
+  go:
+    build:
+      context: .
+      dockerfile: container/Dockerfile
+    volumes:
+      - ./src:/var/www/application
+    tty: true
