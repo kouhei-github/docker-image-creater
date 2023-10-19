@@ -5,8 +5,9 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/cheggaaa/pb/v3"
 	"github.com/spf13/cobra"
+	"nagamatsu-cobra/services"
+	"nagamatsu-cobra/services/progressBar"
 	"os"
 	"sync"
 	"time"
@@ -16,24 +17,39 @@ import (
 var catCmd = &cobra.Command{
 	Use:   "cat",
 	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
+	Long: `
+		A longer description that spans multiple lines and likely contains examples
+		and usage of using your command. For example:
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+		Cobra is a CLI library for Go that empowers applications.
+		This application is a tool to generate the needed files
+		to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		var wg sync.WaitGroup
-		for i := 0; i < 20; i++ {
+
+		pool := poolImplement("MyProgressBar")
+
+		first := progressBar.NewManagerProgress(100, 100, 80)
+		second := progressBar.NewManagerProgress(100, 100, 80)
+		third := progressBar.NewManagerProgress(100, 100, 80)
+
+		pool.AddPool(first.Bar, second.Bar, third.Bar)
+
+		if err := pool.Start(); err != nil {
+			fmt.Println(err.Error())
+			return
+		}
+
+		var stepImp services.SteBarImp
+
+		for _, progress := range []*progressBar.ManageProgress{first, second, third} {
 			wg.Add(1)
-			myProgress := MyProgressManager{
-				count: 100,
-				bar:   pb.Simple.Start(100),
-			}
-			go func(myProgress MyProgressManager) {
-				myProgress.progress()
+			time.Sleep(time.Millisecond * 800)
+			stepImp = progress
+			go func() {
+				stepImp.Progress()
 				wg.Done()
-			}(myProgress)
+			}()
 		}
 		wg.Wait()
 
@@ -45,18 +61,12 @@ to quickly create a Cobra application.`,
 	},
 }
 
-type MyProgressManager struct {
-	count int
-	bar   *pb.ProgressBar
-}
-
-func (progress *MyProgressManager) progress() {
-	progress.bar.SetMaxWidth(80)
-	for i := 0; i < progress.count; i++ {
-		progress.bar.Increment()
-		time.Sleep(time.Millisecond * 30)
+func poolImplement(value string) services.PoolImp {
+	switch value {
+	case "MyProgressBar":
+		return progressBar.NewManagePool()
 	}
-	progress.bar.Finish()
+	return progressBar.NewManagePool()
 }
 
 func init() {
