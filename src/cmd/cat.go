@@ -66,6 +66,28 @@ func poolImplement(value string) services.PoolImp {
 	return progressBar.NewManagePool()
 }
 
+// runPool 使い方
+//
+// -------------------
+//
+// bar := progressBar.NewManagePool()
+//
+//	if err := runPool(bar); err != nil {
+//	   fmt.Println(err.Error())
+//	   return
+//	}
+//
+// -------------------
+func runPool(imp services.PoolImp) error {
+	first := progressBar.NewManagerProgress(100, 100, 80)
+	second := progressBar.NewManagerProgress(100, 100, 80)
+	third := progressBar.NewManagerProgress(100, 100, 80)
+
+	imp.AddPool(first.Bar, second.Bar, third.Bar)
+
+	return imp.Start()
+}
+
 func init() {
 	rootCmd.AddCommand(catCmd)
 	// Here you will define your flags and configuration settings.
