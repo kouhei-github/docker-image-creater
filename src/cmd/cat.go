@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"github.com/spf13/cobra"
+	"math/rand"
 	"nagamatsu-cobra/services"
 	"nagamatsu-cobra/services/progressBar"
 	"os"
@@ -41,7 +42,8 @@ var catCmd = &cobra.Command{
 
 		for _, progress := range []*progressBar.ManageProgress{first, second, third} {
 			wg.Add(1)
-			time.Sleep(time.Millisecond * 800)
+			waitTime := rand.Intn(1001) + 100
+			time.Sleep(time.Millisecond * time.Duration(waitTime))
 			stepImp = progress
 			go func() {
 				stepImp.Progress()

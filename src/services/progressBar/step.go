@@ -2,6 +2,7 @@ package progressBar
 
 import (
 	"github.com/cheggaaa/pb/v3"
+	"math/rand"
 	"time"
 )
 
@@ -10,10 +11,10 @@ type ManageProgress struct {
 	Bar   *pb.ProgressBar
 }
 
-func NewManagerProgress(count int, tootal int, maxWidth int) *ManageProgress {
+func NewManagerProgress(count int, total int, maxWidth int) *ManageProgress {
 	return &ManageProgress{
 		Count: count,
-		Bar:   pb.New(tootal).SetMaxWidth(maxWidth),
+		Bar:   pb.New(total).SetMaxWidth(maxWidth),
 	}
 }
 
@@ -21,7 +22,8 @@ func (progress *ManageProgress) Progress() {
 	progress.Bar.Start()
 	for i := 0; i < progress.Count; i++ {
 		progress.Bar.Increment()
-		time.Sleep(time.Millisecond * 30)
+		waitTime := rand.Intn(501)
+		time.Sleep(time.Millisecond * time.Duration(waitTime))
 	}
 	progress.Bar.Finish()
 }
